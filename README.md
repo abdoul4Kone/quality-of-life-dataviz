@@ -118,7 +118,7 @@ Quatre réserves, assumées.
 ## Reproduire l'analyse
 
 ```bash
-git clone https://github.com/<TON-PSEUDO>/quality-of-life-dataviz.git
+git clone https://github.com/abdoul4Kone/quality-of-life-dataviz.git
 cd quality-of-life-dataviz
 pip install -r requirements.txt
 jupyter notebook traitement_donnees.ipynb
@@ -156,5 +156,5 @@ KOUASSI Yao Kra Emmanuel — construction des variables de classification par pr
 
 > Projet académique réalisé à des fins pédagogiques. L'énoncé original du devoir, propriété de l'ENSEA, n'est pas reproduit dans ce dépôt. Les données proviennent de jeux publics disponibles sur Kaggle.
 
-**Abdoulaye KONE** — Statisticien, diplômé de l'ENSEA
+**Abdoulaye KONE** — Analyste Statisticien, diplômé de l'Ecole Nationale Supérieure de Statistique et Economie Appliquée (ENSEA d'Abidjan)
 [LinkedIn](https://linkedin.com/in/abdoulaye-kone)
