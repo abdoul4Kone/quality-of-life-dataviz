@@ -1,13 +1,18 @@
 # Choisir son pays de destination selon sa profession — tableau de bord Tableau
 
-Tableau de bord interactif classant **216 pays** sur 8 indicateurs de qualité de vie, puis les **re-classant selon la situation professionnelle** du voyageur : salarié, indépendant, étudiant, touriste, sans emploi.
+Tableau de bord interactif classant **230 pays** sur 8 indicateurs de qualité de vie, puis les **re-classant selon la situation professionnelle** du voyageur : salarié, indépendant, étudiant, touriste, sans emploi.
 
-**Résultat clé :** le classement mondial de la qualité de vie est un mauvais guide dès qu'on tient compte de la profession. Le **Rwanda est 216ᵉ sur 216** au classement général — et **1ᵉʳ pour un touriste**. Le **Luxembourg est 1ᵉʳ au général** et seulement **47ᵉ pour un étudiant**. Sur les 10 premiers pays du classement général, **un seul** reste dans le top 10 des quatre profils professionnels.
+**Résultat clé :** le classement mondial de la qualité de vie est un mauvais guide dès qu'on tient compte de la profession. Le **Rwanda est 228ᵉ sur 230** au classement général — et **1ᵉʳ pour un touriste**. Le **Luxembourg est 1ᵉʳ au général** et **52ᵉ pour un étudiant**. Les dix premiers du classement général ont peu de pays en commun avec les classements par profil.
 
 ![Tableau de bord général](images/00_tableau_de_bord_general.jpg)
 
-> 🔗 **Tableau de bord interactif :** *(à publier sur Tableau Public — lien à insérer ici)*
-> En attendant, le classeur `tableau/quality_of_life_dashboard.twbx` s'ouvre dans Tableau Desktop ou Tableau Public (gratuit).
+Les principales vues sont consultables dans les captures ci-dessous. Pour explorer le classeur, télécharge `tableau/quality_of_life_dashboard.twbx` depuis GitHub et ouvre-le avec Tableau Desktop ou Tableau Public. Le classeur contient un extrait de données, mais l'actualisation peut demander de reconnecter les fichiers source, car certaines connexions conservent des chemins locaux de sa création. Aucune publication sur Tableau Public n'est prévue.
+
+### Guide de lecture
+
+1. Commence par le tableau de bord général pour situer les pays sur l'indice global.
+2. Dans le tableau de bord des indicateurs, choisis un indicateur et compare sa carte, sa distribution par continent et son classement par pays.
+3. Dans la vue par profession, sélectionne un profil et compare son classement aux autres critères de la base. Le score sert à comparer les pays selon les hypothèses du projet, pas à fournir une recommandation personnalisée de déménagement.
 
 ---
 
@@ -19,13 +24,13 @@ L'énoncé demandait de construire un tableau de bord Tableau sur un jeu de donn
 
 ## Données
 
-Trois sources, toutes publiques :
+Deux sources de données et une base dérivée :
 
-| Source | Contenu | Volume |
+| Source | Contenu | Volume / licence |
 |---|---|---|
-| *Quality of Life Index* (Kaggle) | 8 indicateurs chiffrés + leur catégorie, par pays | 236 pays, 19 variables |
-| *World Population* (Kaggle) | rattachement pays → continent | 234 pays |
-| Base finale produite | indicateurs apurés, normalisés, + 5 scores de profession | **216 pays**, 33 variables |
+| [Quality of Life for Each Country](https://www.kaggle.com/datasets/ahmedmohamed2003/quality-of-life-for-each-country) | 9 indicateurs chiffrés et leurs catégories, issus de Numbeo | 236 pays, 19 variables. La page indique la licence d'utilisation des données Numbeo ; consulter ses [conditions](https://www.numbeo.com/premium/commercial-license). |
+| [World Population Dataset](https://www.kaggle.com/datasets/iamsouravbanerjee/world-population-dataset) | rattachement pays → continent | 234 pays. Kaggle affiche une licence « Other » ; vérifier les conditions auprès de la source avant redistribution. |
+| Base finale produite | indicateurs apurés, normalisés, nombre d'imputations + 5 scores de profession | **230 pays**, 34 variables |
 
 Les huit indicateurs : pouvoir d'achat, sécurité, système de santé, climat, coût de la vie, rapport prix de l'immobilier / revenu, temps de trajet domicile-travail, pollution.
 
@@ -47,11 +52,11 @@ Les huit indicateurs : pouvoir d'achat, sécurité, système de santé, climat, 
 
 ![Matrice des valeurs manquantes avant traitement](images/10_valeurs_manquantes_base_brute.png)
 
-**Imputation par les k plus proches voisins (k = 5).** Le choix se justifie par la structure des données : les pays voisins sur les autres indicateurs ont tendance à se ressembler sur l'indicateur manquant. L'imputation reconstruit donc chaque valeur absente comme la moyenne des 5 pays les plus similaires, plutôt que par une moyenne globale qui aurait écrasé les écarts régionaux. Les **catégories qualitatives** ont ensuite été recalculées à partir des seuils observés sur les valeurs réellement renseignées, puis appliquées à l'ensemble de la base une fois imputée — afin qu'un pays imputé ne reste pas sans catégorie.
+**Imputation par les k plus proches voisins (k = 5).** Les neuf indicateurs sont d'abord ramenés sur une échelle commune pour calculer les distances entre pays, puis les valeurs imputées sont reconverties dans leurs unités d'origine. Cela évite qu'un indicateur à grande amplitude domine mécaniquement la recherche des voisins. Les **catégories qualitatives** manquantes sont complétées à partir des seuils observés pour chaque indicateur. La base finale conserve aussi le nombre d'indicateurs imputés pour chaque pays, afin de rendre cette information visible.
 
 ![Matrice des valeurs manquantes après imputation](images/11_valeurs_manquantes_apres_imputation.png)
 
-**Construction des scores par profession.** Les 8 indicateurs ont été normalisés sur [0, 1], puis les variables dont la hausse *dissuade* de partir (coût de la vie, prix de l'immobilier, temps de trajet, pollution) ont été multipliées par −1, ramenant l'échelle à [−1, 1]. Pour chaque profil, les 5 indicateurs pertinents sont sommés :
+**Construction des scores par profession.** Les huit indicateurs utilisés sont normalisés sur [-1, 1]. Le signe du coût de la vie, du prix immobilier / revenu, du temps de trajet et de la pollution est inversé pour que les valeurs élevées contribuent positivement au score. Les cinq critères de chaque profil sont ensuite additionnés sans pondération :
 
 | Profil | Indicateurs retenus |
 |---|---|
@@ -67,13 +72,13 @@ Les huit indicateurs : pouvoir d'achat, sécurité, système de santé, climat, 
 
 | Pays | Général | Étudiant | Salarié | Indépendant | Touriste |
 |---|---:|---:|---:|---:|---:|
-| Rwanda | 216ᵉ | 172ᵉ | 36ᵉ | 172ᵉ | **1ᵉʳ** |
-| Bhoutan | 65ᵉ | 2ᵉ | 8ᵉ | **1ᵉʳ** | 4ᵉ |
-| Tuvalu | 18ᵉ | **1ᵉʳ** | **1ᵉʳ** | 57ᵉ | 24ᵉ |
-| Luxembourg | **1ᵉʳ** | 47ᵉ | 15ᵉ | 30ᵉ | 32ᵉ |
-| Andorre | 10ᵉ | 4ᵉ | 5ᵉ | 7ᵉ | 2ᵉ |
+| Rwanda | 228ᵉ | 188ᵉ | 38ᵉ | 181ᵉ | **1ᵉʳ** |
+| Bhoutan | 50ᵉ | 2ᵉ | 9ᵉ | **1ᵉʳ** | 4ᵉ |
+| Tuvalu | 32ᵉ | **1ᵉʳ** | **1ᵉʳ** | 52ᵉ | 21ᵉ |
+| Luxembourg | **1ᵉʳ** | 52ᵉ | 15ᵉ | 37ᵉ | 37ᵉ |
+| Andorre | 18ᵉ | 4ᵉ | 6ᵉ | 11ᵉ | 3ᵉ |
 
-Sur les 10 premiers pays du classement général, seuls **1 à 3 selon le profil** figurent encore dans le top 10 professionnel. Seule **Andorre** tient dans les cinq classements à la fois : c'est le seul compromis universel de la base.
+Parmi les dix premiers du classement général, **0 à 3 pays** figurent aussi dans le top 10 d'un profil donné. Aucun pays ne figure simultanément dans le top 10 général et dans les cinq classements professionnels. **Andorre** reste bien placée pour quatre profils, mais arrive 11ᵉ pour les indépendants.
 
 ![Carte des scores pour le profil étudiant](images/08_score_destination_etudiant.jpg)
 
@@ -105,15 +110,19 @@ Contrôle des valeurs manquantes après fusion des deux sources :
 
 ## Limites et pistes d'amélioration
 
-Quatre réserves, assumées.
+Cinq réserves, assumées.
 
-**Les profils « étudiant » et « sans emploi » retiennent les cinq mêmes indicateurs.** Leurs scores sont donc *strictement identiques* sur les 216 pays — vérifié : zéro écart. Les cinq profils annoncés ne produisent en réalité que **quatre classements distincts**. Différencier les deux profils supposerait d'écarter au moins un critère de l'un des deux, ou de les pondérer différemment.
+**Les profils « étudiant » et « sans emploi » retiennent les cinq mêmes indicateurs.** Leurs scores sont donc *strictement identiques* sur les 230 pays — vérifié : zéro écart. Les cinq profils annoncés ne produisent en réalité que **quatre classements distincts**. Différencier les deux profils supposerait d'écarter au moins un critère de l'un des deux, ou de les pondérer différemment.
 
-**La fusion avec la base des continents a fait perdre 20 pays et territoires** (236 → 216), non par absence de données mais par différence d'orthographe entre les deux sources : `Antigua And Barbuda` contre `Antigua and Barbuda`, `Hong Kong (China)` contre `Hong Kong`, `Democratic Republic of the Congo` contre `DR Congo`. Une normalisation des noms de pays — ou mieux, une jointure sur code ISO à trois lettres, déjà présent dans la base de population — récupérerait ces 20 lignes.
+**La fusion avec la base des continents exclut encore 6 pays et territoires** (236 → 230), car ils n'ont pas d'équivalent dans cette source. La normalisation des noms et trois alias explicites ont récupéré les 14 autres correspondances, malgré les différences de casse, de ponctuation ou d'appellation. Une jointure par code ISO à trois lettres serait préférable si les deux sources fournissaient ce code.
 
 **Les scores sont des sommes non pondérées**, ce qui suppose que les cinq critères d'un profil pèsent exactement autant. C'est ce qui explique les positions contre-intuitives : l'inversion du coût de la vie récompense mécaniquement les pays les moins chers, sans contrepartie de revenu ou d'opportunité. Une pondération explicite, ou un curseur de pondération dans le tableau de bord, rendrait le classement défendable.
 
-**Certains pays reposent presque entièrement sur des valeurs imputées.** Montserrat, dont **8 des 9 indicateurs** ont été estimés, se classe 6ᵉ pour le profil étudiant. La corrélation entre le nombre de valeurs imputées et le score reste faible à l'échelle de la base (−0,11), donc l'imputation ne biaise pas le classement d'ensemble — mais un indicateur de fiabilité par pays devrait accompagner l'affichage.
+**Certains pays reposent presque entièrement sur des valeurs imputées.** Montserrat, dont **8 des 9 indicateurs** ont été estimés, se classe 7ᵉ pour le profil étudiant. Le nombre imputé est maintenant fourni dans la base finale ; il signale une dépendance aux estimations, mais ne constitue pas à lui seul une mesure statistique de fiabilité.
+
+**Les visuels Tableau sont un instantané antérieur au recalcul.** Le classeur et les captures du dépôt n'ont pas été actualisés avec les nouvelles imputations et les nouveaux scores. Les classements actuels sont ceux du CSV final généré par le notebook ; il faudra actualiser l'extrait Tableau dans l'application pour faire concorder les deux.
+
+Le [rapport PDF](reports/rapport_projet.pdf) documente le rendu académique original. Il n'a pas été recalculé avec cette version du notebook ; ses chiffres et sa description de méthode peuvent donc différer des exports actuels.
 
 ## Reproduire l'analyse
 
@@ -124,16 +133,20 @@ pip install -r requirements.txt
 jupyter notebook traitement_donnees.ipynb
 ```
 
-Le notebook part de `data/quality_of_life_brut.csv` et reconstruit la base apurée et normalisée. Le classeur Tableau s'ouvre ensuite directement : `tableau/quality_of_life_dashboard.twbx` embarque ses propres données et ne nécessite aucune reconnexion.
+Le notebook part de `data/quality_of_life_brut.csv` et reconstruit les bases nettoyée, normalisée et finale. Le CSV final utilise le séparateur standard virgule et le point décimal ; il s'ouvre directement avec `pandas.read_csv()`.
+
+Le classeur `tableau/quality_of_life_dashboard.twbx` est fourni pour consultation locale, sans lien Tableau Public. Son extrait intégré correspond à une version antérieure des données ; reconnecte-le au CSV final avant d'actualiser les vues.
 
 ## Contenu du dépôt
 
 ```
 traitement_donnees.ipynb                          Apurement, imputation KNN, normalisation
 data/quality_of_life_brut.csv                     Base source (236 pays, 19 variables)
-data/quality_of_life_final_scores_profession.csv  Base finale (216 pays, + 5 scores)
+data/quality_of_life_cleaned.csv                  Base apurée et fusionnée (230 pays)
+data/quality_of_life_cleaned_data_normalized.csv   Indicateurs normalisés (230 pays)
+data/quality_of_life_final_scores_profession.csv  Base finale (230 pays, 34 variables)
 data/world_population.csv                         Base de rattachement aux continents
-data/world_continent_country.csv                  Table pays → continent extraite
+data/world_continent_country.csv                  Table pays → continent (sans index parasite)
 tableau/quality_of_life_dashboard.twbx            Classeur Tableau complet (feuilles,
                                                   tableaux de bord, storytelling)
 images/                                           Captures des visualisations
